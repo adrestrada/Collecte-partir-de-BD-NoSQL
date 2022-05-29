@@ -1,0 +1,56 @@
+!pip install pymongo
+Collecting pymongo
+  Downloading pymongo-4.0.2-cp38-cp38-win_amd64.whl (350 kB)
+Installing collected packages: pymongo
+Successfully installed pymongo-4.0.2
+
+import datetime
+from pymongo import MongoClient
+client = MongoClient('localhost', 27017)
+bd = client.db.posts_coll
+
+posts = {"auteur":"Flouflou",
+         "texte":"Mon premier post du mois",
+         "tags":["python","mongodb"],
+         "date":datetime.datetime.utcnow()}
+         
+ #Insertion d'un seul post
+post_id = bd.insert_one(posts).inserted_id
+print(post_id)
+
+#Obtenir un post
+import pprint as p
+p.pprint(bd.find_one())
+
+print("=" * 45)
+#recherche par un critere
+p.pprint(bd.find_one({'auteur':'Flouflou'}))
+print("=" * 45)
+p.pprint(bd.find_one({'auteur':'Mike'}))
+
+#insertion en mode batch
+liste_posts =[
+{"auteur":"FlouClair",
+         "texte":"Le renard saute la barriere",
+         "tags":["renard","barriere"],
+         "date":datetime.datetime.utcnow()},
+{"auteur":"ClairClair",
+         "texte":"les moutons n'ont aucune chance",
+         "tags":["mouton","chance"],
+         "date":datetime.datetime.utcnow()}
+]
+resultats = bd.insert_many(liste_posts)
+
+#recuperer les IDs des posts insérés
+#afficher les IDS
+print("=" * 45)
+print(resultats.inserted_ids)
+print("=" * 45)
+
+#Recuperer les posts
+for post in bd.find():
+    print("-" * 45)
+    print(post)
+ #Afficher le nombre de documents dans la collection
+print("=" * 45)
+print(bd.count_documents({}))
